@@ -1,9 +1,15 @@
 defmodule HorizonsClient do
   @base_url "https://ssd.jpl.nasa.gov/api/horizons.api"
 
-  def get_ephemerides(object_id, start_date, end_date) do
-    #url = "#{@base_url}?format=text&COMMAND='#{object_id}'&START_TIME='#{start_date}'&STOP_TIME='#{end_date}'"
-    url = "#{@base_url}?format=json&COMMAND='#{object_id}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='ssb'&START_TIME='#{start_date}'&STOP_TIME='#{end_date}'&STEP_SIZE='1%20d'"
+
+  @doc """
+  Get ephemerides for an object from JPL Horizons.
+  """
+  def get_latest_ephemeris(object_id) do
+    current_time = DateTime.utc_now() |> DateTime.to_naive()
+
+    url = "#{@base_url}?format=json&COMMAND='#{object_id}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='ssb'&TLIST='#{current_time}'&QUANTITIES='1,9,20,23,24,29'"
+
     case HTTPoison.get(url) do
       {:ok, %{status_code: 200, body: body}} ->
         {:ok, body}
